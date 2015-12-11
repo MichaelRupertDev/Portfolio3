@@ -1,0 +1,92 @@
+<head>
+<meta charset="utf-8" />
+<title>HTML5 Canvas Drawing Board</title>
+<script type="text/JavaScript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js?ver=1.4.2"></script>
+</head>
+<body>
+	<canvas id="myCanvas">
+		Sorry, your browser does not support HTML5 canvas technology.
+	</canvas>
+
+	<div id="tools">
+		
+	</div>
+	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
+    <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
+	<script>
+		window.onload = function() {
+		var myCanvas = document.getElementById("myCanvas");
+		var ctx = myCanvas.getContext("2d");
+	   
+	    // Fill Window Width and Height
+	    myCanvas.width = window.innerWidth - 200;
+		myCanvas.height = window.innerHeight;
+		
+		// Set Background Color
+	    ctx.fillStyle="#fff";
+	    ctx.fillRect(0,0,myCanvas.width,myCanvas.height);
+		
+	    function Point(x, y) {
+  			this.x = x;
+  			this.y = y;
+		}
+
+	    function Shape(points, color, brush) {
+	    	this.points = points;
+	    	this.color = color;
+	    	this.brush = brush;
+	    }
+
+	    // Mouse Event Handlers
+		if(myCanvas){
+			var socket = io();
+      		socket.on('shape', function(Shape){
+      			console.log(Shape);
+      			for(var i = 0; i < Shape.points.length - 1; i ++){
+      				ctx.fillStyle = "#000000";
+      				ctx.beginPath()
+      				var startX = Shape.points[i].x;
+      				var endX = Shape.points[i+1].x;
+      				var startY = Shape.points[i].y;
+      				var endY = Shape.points[i+1].y;
+      				ctx.moveTo(startX, startY);
+      				ctx.lineTo(endX, endY);
+      				ctx.stroke();
+      				//ctx.fillRect(Shape.points[i].x, Shape.points[i].y, 1, 1);
+      			}
+      		});
+
+			var isDown = false;
+			var canvasX, canvasY;
+			ctx.lineWidth = 5;
+			var points = [];
+
+			$(myCanvas)
+			.mousedown(function(e){
+				isDown = true;
+				points = [];
+				canvasX = e.pageX - myCanvas.offsetLeft;
+				canvasY = e.pageY - myCanvas.offsetTop;
+				points.push(new Point(canvasX, canvasY));
+			})
+			.mousemove(function(e){
+				if(isDown !== false) {
+					canvasX = e.pageX - myCanvas.offsetLeft;
+					canvasY = e.pageY - myCanvas.offsetTop;
+					points.push(new Point(canvasX, canvasY));
+				}
+			})
+			.mouseup(function(e){
+				isDown = false;
+				var shape = new Shape(points, "black", "draw");
+				console.log(shape);
+				socket.emit('shape', shape);
+			});
+		}
+
+
+	};
+	</script>
+</script>
+</body>
+</html>
