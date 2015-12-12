@@ -22,9 +22,12 @@
 		<button id="yellow" style="height:47px;width:47px;background-color:#FFFF00;">     </button>
 		<button id="green" style="height:47px;width:47px;background-color:#00FF00;">     </button>
 		<button id="blue" style="height:47px;width:47px;background-color:#0000FF;">     </button>
-		<button id="gray" style="height:47px;width:47px;background-color:#BDBDBD;">     </button>
+		<button id="grey" style="height:47px;width:47px;background-color:#BDBDBD;">     </button>
 		<button id="pink" style="height:47px;width:47px;background-color:#FE2EF7;">     </button>
 		<button id="purple" style="height:47px;width:47px;background-color:#B404AE;">     </button>
+		</br></br>
+		<button id="pen" style="height:47px;width:47px;">PEN</button>
+		<button id="text" style="height:47px;width:47px;">TEXT</button>
 	</div>
 
 	<button id="clear" style="position:absolute; left:1050px; top:910px; width:105px; height: 30px;">Clear</button>
@@ -40,6 +43,7 @@
 	//Color Handling
 	$(document).ready(function(){
 		color = "#000000";
+		mode = 0;
 		$("#white").click(function(){
 			color = "#FFFFFF";
 			console.log(color);
@@ -80,6 +84,15 @@
 			color = "#B404AE";
 			console.log(color);
 		});
+
+		$("#pen").click(function(){
+			mode = 0;
+			console.log("pen");
+		});
+		$("#text").click(function(){
+			mode = 1;
+			console.log("text");
+		});
 	});
 	</script>
 	<script>
@@ -106,10 +119,16 @@
 	    	this.brush = brush;
 	    }
 
+	    function Text(point, color, text){
+			this.point = point;
+			this.color = color;
+			this.text = text;
+		}
+
 	    $('#clear').click(function(){
 			ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
 		});
-		
+
 	    // Mouse Event Handlers
 		if(myCanvas){
 			var socket = io();
@@ -128,6 +147,14 @@
       				ctx.stroke();
        			}
       		});
+
+      		socket.on('text', function(Text){
+				ctx.font = "60pt Calibri";
+				ctx.strokeStyle = Text.color;
+				ctx.fillStyle = Text.color;
+				ctx.strokeText(Text.text, Text.point[0].x, Text.point[0].y, 300);
+			});
+
       		socket.on('chat message', function(msg){
       			if($('#chat').children().length > 5){
       				$('#chat').children()[1].remove();
@@ -146,26 +173,42 @@
 			var points = [];
 
 			$(myCanvas)
-			.mousedown(function(e){
-				isDown = true;
-				points = [];
-				canvasX = e.pageX - myCanvas.offsetLeft;
-				canvasY = e.pageY - myCanvas.offsetTop;
-				points.push(new Point(canvasX, canvasY));
-			})
-			.mousemove(function(e){
-				if(isDown !== false) {
-					canvasX = e.pageX - myCanvas.offsetLeft;
-					canvasY = e.pageY - myCanvas.offsetTop;
-					points.push(new Point(canvasX, canvasY));
-				}
-			})
-			.mouseup(function(e){
-				isDown = false;
-				var shape = new Shape(points, color, "draw");
-				console.log(shape);
-				socket.emit('shape', shape);
-			});
+				.mousedown(function(e){
+					if(mode == 0){
+						isDown = true;
+						points = [];
+						canvasX = e.pageX - myCanvas.offsetLeft;
+						canvasY = e.pageY - myCanvas.offsetTop;
+						points.push(new Point(canvasX, canvasY));
+					}
+					else if(mode == 1){
+						points = [];
+						canvasX = e.pageX - myCanvas.offsetLeft;
+						canvasY = e.pageY - myCanvas.offsetTop;
+						points.push(new Point(canvasX, canvasY));
+						var txt = prompt("Please enter text:");
+						var text = new Text(points, color, txt);
+						console.log(text);
+						socket.emit('text', text);
+					}
+				})
+				.mousemove(function(e){
+					if(mode == 0){
+						if(isDown !== false) {
+							canvasX = e.pageX - myCanvas.offsetLeft;
+							canvasY = e.pageY - myCanvas.offsetTop;
+							points.push(new Point(canvasX, canvasY));
+						}
+					}
+				})
+				.mouseup(function(e){
+					if(mode == 0){
+						isDown = false;
+						var shape = new Shape(points, color, "draw");
+						console.log(shape);
+						socket.emit('shape', shape);
+					}
+				});
 		}
 
 
