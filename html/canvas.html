@@ -70,10 +70,11 @@
 		if(myCanvas){
 			var socket = io();
       		socket.on('shape', function(Shape){
+      			ctx.strokeStyle = Shape.color;
       			console.log(Shape);
+      			console.log("Recieved shape color: " + Shape.color);
       			for(var i = 0; i < Shape.points.length - 1; i ++){
-      				ctx.fillStyle = "#000000";
-      				ctx.beginPath()
+      				ctx.beginPath();
       				var startX = Shape.points[i].x;
       				var endX = Shape.points[i+1].x;
       				var startY = Shape.points[i].y;
@@ -81,8 +82,7 @@
       				ctx.moveTo(startX, startY);
       				ctx.lineTo(endX, endY);
       				ctx.stroke();
-      				//ctx.fillRect(Shape.points[i].x, Shape.points[i].y, 1, 1);
-      			}
+       			}
       		});
 
 			var isDown = false;
@@ -107,7 +107,7 @@
 			})
 			.mouseup(function(e){
 				isDown = false;
-				var shape = new Shape(points, "black", "draw");
+				var shape = new Shape(points, color, "draw");
 				console.log(shape);
 				socket.emit('shape', shape);
 			});
