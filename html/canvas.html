@@ -8,16 +8,45 @@
 		Sorry, your browser does not support HTML5 canvas technology.
 	</canvas>
 
-	<div id="tools">
-		
+	<div id="tools" style="position:absolute;left:1050px;top:5px;height:900px;width:100px;border-style:inset;background-color:#DCDCDC;">
+		<button id="white" style="height:47px;width:47px;background-color:#FFFFFF;">     </button>
+		<button id="black" style="height:47px;width:47px;background-color:#000000;">     </button>
+		<button id="red" style="height:47px;width:47px;background-color:#FF0000;">     </button>
+		<button id="orange" style="height:47px;width:47px;background-color:#FF8000;">     </button>
+		<button id="yellow" style="height:47px;width:47px;background-color:#FFFF00;">     </button>
+		<button id="green" style="height:47px;width:47px;background-color:#00FF00;">     </button>
+		<button id="blue" style="height:47px;width:47px;background-color:#0000FF;">     </button>
+		<button id="gray" style="height:47px;width:47px;background-color:#BDBDBD;">     </button>
+		<button id="pink" style="height:47px;width:47px;background-color:#FE2EF7;">     </button>
+		<button id="purple" style="height:47px;width:47px;background-color:#B404AE;">     </button>
 	</div>
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 	<script>
+	$(document).ready(function(){
+		color = "#000000";
+		$("#white").click(function(){
+			color = "#FFFFFF";
+			console.log(color);
+		});
+		$("#black").click(function(){
+			color = "#000000";
+			console.log(color);
+		});
+		$("#red").click(function(){
+			color = "#FF0000";
+			console.log(color);
+		});
+		$("#orange").click(function(){
+			color = "#FF8000";
+			console.log(color);
+		});
+	});
+	</script>
+	<script>
 		window.onload = function() {
 		var myCanvas = document.getElementById("myCanvas");
 		var ctx = myCanvas.getContext("2d");
-	   	
 	    // Fill Window Width and Height
 	    myCanvas.width = 1024;
 		myCanvas.height = 900;
