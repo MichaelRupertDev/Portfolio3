@@ -12,6 +12,10 @@ io.on('connection', function(socket){
 		console.log('Shape recieved: ' + Shape);
 		io.emit('shape', Shape);
 	});
+	socket.on('chat message', function(msg){
+    	console.log('message: ' + msg);
+    	io.emit('chat message', msg);
+  });
 });
 
 http.listen(3000, function(){

@@ -1,7 +1,13 @@
 <head>
-<meta charset="utf-8" />
-<title>HTML5 Canvas Drawing Board</title>
-<script type="text/JavaScript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js?ver=1.4.2"></script>
+	<meta charset="utf-8" />
+	<title>Live Draw! RupertJohnson</title>
+	<script type="text/JavaScript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js?ver=1.4.2"></script>
+	<style>
+		body { font: 13px Helvetica, Arial; }
+		#chat { list-style-type: none; margin: 0; padding: 0; }
+      	#chat li { padding: 5px 10px; }
+      	#chat li:nth-child(odd) { background: #fee; }
+	</style>
 </head>
 <body>
 	<canvas id="myCanvas" style="border:1px solid #000000;">
@@ -20,9 +26,18 @@
 		<button id="pink" style="height:47px;width:47px;background-color:#FE2EF7;">     </button>
 		<button id="purple" style="height:47px;width:47px;background-color:#B404AE;">     </button>
 	</div>
+
+	<button id="clear" style="position:absolute; left:1050px; top:910px; width:105px; height: 30px;">Clear</button>
+
+	<ul id="chat" style="postition:absolute;left:10px;top:920px;height:150px;width:1024px;border-style:inset;background-color:#DCDCDC;">
+	<form action="" style="position:absolute; left:15px; top:1055px; width:1004; height:20px">
+		<input id="m" autocomplete="off" style="width:900px;"/><button>Send</button>
+	</form>
+	</ul>
 	<script src="https://cdn.socket.io/socket.io-1.2.0.js"></script>
     <script src="http://code.jquery.com/jquery-1.11.1.js"></script>
 	<script>
+	//Color Handling
 	$(document).ready(function(){
 		color = "#000000";
 		$("#white").click(function(){
@@ -68,6 +83,7 @@
 	});
 	</script>
 	<script>
+		//get canvas for storage in variable
 		window.onload = function() {
 		var myCanvas = document.getElementById("myCanvas");
 		var ctx = myCanvas.getContext("2d");
@@ -90,6 +106,10 @@
 	    	this.brush = brush;
 	    }
 
+	    $('#clear').click(function(){
+			ctx.clearRect(0, 0, myCanvas.width, myCanvas.height);
+		});
+		
 	    // Mouse Event Handlers
 		if(myCanvas){
 			var socket = io();
@@ -108,7 +128,18 @@
       				ctx.stroke();
        			}
       		});
+      		socket.on('chat message', function(msg){
+      			if($('#chat').children().length > 5){
+      				$('#chat').children()[1].remove();
+      			}
+    			$('#chat').append($('<li>').text(msg));
+  			});
 
+      		$('form').submit(function(){
+			    socket.emit('chat message', $('#m').val());
+			    $('#m').val('');
+    			return false;
+  			});
 			var isDown = false;
 			var canvasX, canvasY;
 			ctx.lineWidth = 5;
